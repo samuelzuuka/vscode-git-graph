@@ -911,7 +911,7 @@ export interface RequestLoadCommits extends RepoRequest {
 	readonly remotes: ReadonlyArray<string>;
 	readonly hideRemotes: ReadonlyArray<string>;
 	readonly stashes: ReadonlyArray<GitStash>;
-	//@feat-update-search
+	// @feat-update-search
 	readonly author?: string;
 	readonly committer?: string;
 	readonly commitMessage?: string;

@@ -33,25 +33,17 @@
             "warn",
             "property"
         ],
-        "eol-last": "warn",
         "eqeqeq": "warn",
         "func-call-spacing": "warn",
-        "indent": [
-            "warn",
-            "tab",
-            {
-                "SwitchCase": 1
-            }
-        ],
+        "no-console": "off",
+        "no-trailing-spaces": "off",
+        "eol-last": "off",
+        "indent": "off",
         "key-spacing": "warn",
-        "linebreak-style": [
-            "warn",
-            "windows"
-        ],
+        "linebreak-style": "off",
         "new-cap": "warn",
         "new-parens": "warn",
         "no-alert": "error",
-        "no-console": "error",
         "no-eval": "error",
         "no-extra-boolean-cast": "warn",
         "no-implied-eval": "error",
@@ -67,7 +59,6 @@
         "no-script-url": "error",
         "no-sparse-arrays": "warn",
         "no-throw-literal": "warn",
-        "no-trailing-spaces": "warn",
         "no-unneeded-ternary": "warn",
         "no-unsafe-negation": "warn",
         "no-unused-expressions": "warn",

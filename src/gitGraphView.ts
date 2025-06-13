@@ -720,21 +720,25 @@ export class GitGraphView extends Disposable {
 				<div id="controls">
 					<span id="repoControl"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
 					<span id="branchControl"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
-					<label id="showRemoteBranchesControl"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Show Remote Branches</label>
+					<label id="showRemoteBranchesControl">
+						<input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1">
+							<span class="customCheckbox"></span>
+							Show Remote Branches
+					</label>
 					<div id="findBtn" title="Find"></div>
 					<div id="terminalBtn" title="Open a Terminal for this Repository"></div>
 					<div id="settingsBtn" title="Repository Settings"></div>
 					<div id="fetchBtn"></div>
 					<div id="refreshBtn"></div>
 				</div>
-				<div id="controls-v2" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px;">
-					<input type="text" id="authorInput" placeholder="Author" style="flex-grow: 1; min-width: 80px;">
-					<input type="text" id="commitIdInput" placeholder="Commit ID" style="flex-grow: 1; min-width: 80px;">
-					<input type="text" id="commitMessageInput" placeholder="Commit Message" style="flex-grow: 1; min-width: 120px;">
-					<input type="text" id="pathInput" placeholder="Path" style="flex-grow: 1; min-width: 100px;">
-					<input type="date" id="dateFromInput" title="Date From" style="flex-grow: 1; min-width: 120px;">
-					<input type="date" id="dateToInput" title="Date To" style="flex-grow: 1; min-width: 120px;">
-					<button id="searchBtn" title="Search">Search</button>
+				<div id="controls-v2" class="ggrh:flex ggrh:flex-wrap ggrh:items-center ggrh:gap-0.5 ggrh:p-0.5 ggrh:bg-gray-800 ggrh:rounded ggrh:shadow-md ggrh:text-xs">
+					<input type="text" id="commitIdInput" placeholder="Commit ID" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:border-gray-700 ggrh:rounded ggrh:bg-gray-900 ggrh:text-gray-100 ggrh:placeholder-gray-400 ggrh:focus:outline-none ggrh:focus:ring-2 ggrh:focus:ring-blue-500 ggrh:focus:border-blue-500 ggrh:text-xs">
+					<input type="text" id="commitMessageInput" placeholder="Commit Message" class="ggrh:flex-1 ggrh:min-w-[60px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:border-gray-700 ggrh:rounded ggrh:bg-gray-900 ggrh:text-gray-100 ggrh:placeholder-gray-400 ggrh:focus:outline-none ggrh:focus:ring-2 ggrh:focus:ring-blue-500 ggrh:focus:border-blue-500 ggrh:text-xs">
+					<input type="text" id="authorInput" placeholder="Author" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:border-gray-700 ggrh:rounded ggrh:bg-gray-900 ggrh:text-gray-100 ggrh:placeholder-gray-400 ggrh:focus:outline-none ggrh:focus:ring-2 ggrh:focus:ring-blue-500 ggrh:focus:border-blue-500 ggrh:text-xs">
+					<input type="date" id="dateFromInput" title="Date From" class="ggrh:flex-1 ggrh:min-w-[60px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:border-gray-700 ggrh:rounded ggrh:bg-gray-900 ggrh:text-gray-100 ggrh:placeholder-gray-400 ggrh:focus:outline-none ggrh:focus:ring-2 ggrh:focus:ring-blue-500 ggrh:focus:border-blue-500 ggrh:text-xs">
+					<input type="date" id="dateToInput" title="Date To" class="ggrh:flex-1 ggrh:min-w-[60px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:border-gray-700 ggrh:rounded ggrh:bg-gray-900 ggrh:text-gray-100 ggrh:placeholder-gray-400 ggrh:focus:outline-none ggrh:focus:ring-2 ggrh:focus:ring-blue-500 ggrh:focus:border-blue-500 ggrh:text-xs">
+					<input type="text" id="pathInput" placeholder="Path" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:border-gray-700 ggrh:rounded ggrh:bg-gray-900 ggrh:text-gray-100 ggrh:placeholder-gray-400 ggrh:focus:outline-none ggrh:focus:ring-2 ggrh:focus:ring-blue-500 ggrh:focus:border-blue-500 ggrh:text-xs">
+					<button id="searchBtn" title="Search" class="ggrh:px-2 ggrh:py-0.5 ggrh:bg-gray-700 ggrh:text-gray-100 ggrh:font-semibold ggrh:rounded ggrh:shadow-sm ggrh:hover:bg-gray-600 ggrh:focus:outline-none ggrh:focus:ring-2 ggrh:focus:ring-gray-500 ggrh:focus:ring-offset-2 ggrh:text-xs">Search</button>
 				</div>
 				<div id="content">
 					<div id="commitGraph"></div>

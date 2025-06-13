@@ -1,0 +1,7 @@
+---
+description: 
+globs: *.ts
+alwaysApply: false
+---
+
+## tailwindcss统一使用ggrh前缀防止冲突,例如原先是 flex-1,那现在应该是 ggrh:flex-1

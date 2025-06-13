@@ -651,6 +651,7 @@ svg.openFolderIcon, svg.closedFolderIcon, svg.fileIcon{
 	vertical-align:top;
 	margin-top:7px;
 	cursor:help;
+	box-sizing: content-box;
 }
 #commitTable tr.commit:hover, #commitTable tr.commit.contextMenuActive, #commitTable tr.commit.findCurrentCommit:hover, #commitTable tr.commit.graphVertexActive, #commitTable tr.commit.dialogActive{
 	background-color:rgba(128,128,128,0.15);
@@ -706,6 +707,7 @@ body.vscode-high-contrast #commitTable tr.commit.findCurrentCommit{
 	font-size:12px;
 	cursor:default;
 	overflow:hidden;
+	box-sizing: content-box;
 }
 .gitRef.active{
 	border-color:var(--git-graph-color);
@@ -720,6 +722,8 @@ body.vscode-high-contrast #commitTable tr.commit.findCurrentCommit{
 	height:14px;
 	padding:2px;
 	vertical-align:top;
+	display: inline-block;
+	box-sizing: content-box;
 }
 
 .gitRefName, .gitRefHeadRemote{
@@ -1021,3 +1025,5 @@ label > input[type=radio]:checked ~ .customRadio:after{
 	-webkit-user-select:none;
 	user-select:none;
 }
+
+/* @import url("./tailwind-dist.css"); */

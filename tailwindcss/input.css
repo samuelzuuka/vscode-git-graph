@@ -1,0 +1,9 @@
+@import "tailwindcss" source("../web") prefix(ggrh);
+@source "../src/gitGraphView.ts";
+@source not "../web/styles";
+
+@layer base {
+  .google-map * {
+    box-sizing: content-box;
+  }
+}
