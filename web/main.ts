@@ -54,6 +54,17 @@ class GitGraphView {
 	private readonly refreshBtnElem: HTMLElement;
 	private readonly scrollShadowElem: HTMLElement;
 
+	// @feat-update-search
+	private readonly authorInput: HTMLInputElement;
+	private readonly commitIdInput: HTMLInputElement;
+	private readonly commitMessageInput: HTMLInputElement;
+	private readonly pathInput: HTMLInputElement;
+	private readonly dateFromInput: HTMLInputElement;
+	private readonly dateToInput: HTMLInputElement;
+	private readonly searchBtn: HTMLElement;
+	private searchTimeout: number | null = null;
+	private lastSearchedTerms: { author?: string; committer?: string; commitMessage?: string; commitHash?: string; dateFrom?: number; dateTo?: number; paths?: string[]; } = {};
+
 	constructor(viewElem: HTMLElement, prevState: WebViewState | null) {
 		this.gitRepos = initialState.repos;
 		this.config = initialState.config;
@@ -104,6 +115,30 @@ class GitGraphView {
 			}
 		});
 		this.renderRefreshButton();
+
+		this.authorInput = <HTMLInputElement>document.getElementById('authorInput')!;
+		this.commitIdInput = <HTMLInputElement>document.getElementById('commitIdInput')!;
+		this.commitMessageInput = <HTMLInputElement>document.getElementById('commitMessageInput')!;
+		this.pathInput = <HTMLInputElement>document.getElementById('pathInput')!;
+		this.dateFromInput = <HTMLInputElement>document.getElementById('dateFromInput')!;
+		this.dateToInput = <HTMLInputElement>document.getElementById('dateToInput')!;
+		this.searchBtn = document.getElementById('searchBtn')!;
+
+		const inputElements = [
+			this.authorInput,
+			this.commitIdInput,
+			this.commitMessageInput,
+			this.pathInput,
+			this.dateFromInput,
+			this.dateToInput
+		];
+
+		inputElements.forEach(input => {
+			// input.addEventListener('input', () => this.debounceSearch());
+			input.addEventListener('change', () => this.triggerSearch()); // For date inputs
+		});
+
+		this.searchBtn.addEventListener('click', () => this.triggerSearch());
 
 		this.findWidget = new FindWidget(this);
 		this.settingsWidget = new SettingsWidget(this);
@@ -163,6 +198,41 @@ class GitGraphView {
 		});
 	}
 
+	private debounceSearch() {
+		if (this.searchTimeout !== null) {
+			clearTimeout(this.searchTimeout);
+		}
+		this.searchTimeout = setTimeout(() => {
+			this.triggerSearch();
+		}, 500) as unknown as number; // 断言为 number 类型
+	}
+
+	private triggerSearch() {
+		const newSearchTerms: { author?: string; committer?: string; commitMessage?: string; commitHash?: string; dateFrom?: number; dateTo?: number; paths?: string[]; } = {};
+		const author = this.authorInput.value.trim();
+		const commitId = this.commitIdInput.value.trim();
+		const commitMessage = this.commitMessageInput.value.trim();
+		const path = this.pathInput.value.trim();
+		const dateFrom = this.dateFromInput.value;
+		const dateTo = this.dateToInput.value;
+
+		if (author) newSearchTerms.author = author;
+
+		if (commitMessage) newSearchTerms.commitMessage = commitMessage;
+		if (commitId) newSearchTerms.commitHash = commitId;
+		if (dateFrom) newSearchTerms.dateFrom = new Date(dateFrom).getTime() / 1000;
+		if (dateTo) newSearchTerms.dateTo = new Date(dateTo).getTime() / 1000;
+		if (path) newSearchTerms.paths = path.split(/\s*,\s*|\s+/);
+
+		// 检查搜索条件是否实际发生了变化
+		const hasChanged = JSON.stringify(newSearchTerms) !== JSON.stringify(this.lastSearchedTerms);
+
+		if (hasChanged) {
+			this.lastSearchedTerms = newSearchTerms;
+			this.maxCommits = this.config.initialLoadCommits; // 重置加载数量
+			this.refresh(true); // 强制刷新并应用新的搜索条件
+		}
+	}
 
 	/* Loading Data */
 
@@ -617,7 +687,14 @@ class GitGraphView {
 			commitOrdering: getCommitOrdering(repoState.commitOrdering),
 			remotes: this.gitRemotes,
 			hideRemotes: repoState.hideRemotes,
-			stashes: this.gitStashes
+			stashes: this.gitStashes,
+			author: this.lastSearchedTerms.author,
+			committer: this.lastSearchedTerms.committer,
+			commitMessage: this.lastSearchedTerms.commitMessage,
+			commitHash: this.lastSearchedTerms.commitHash,
+			dateFrom: this.lastSearchedTerms.dateFrom,
+			dateTo: this.lastSearchedTerms.dateTo,
+			paths: this.lastSearchedTerms.paths
 		});
 	}
 

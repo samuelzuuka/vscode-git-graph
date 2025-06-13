@@ -235,14 +235,14 @@ export class GitGraphView extends Disposable {
 				});
 				break;
 			case 'commitDetails':
-				let data = await Promise.all<GitCommitDetailsData, string | null>([
+				let data = await Promise.all([
 					msg.commitHash === UNCOMMITTED
 						? this.dataSource.getUncommittedDetails(msg.repo)
 						: msg.stash === null
 							? this.dataSource.getCommitDetails(msg.repo, msg.commitHash, msg.hasParents)
 							: this.dataSource.getStashDetails(msg.repo, msg.commitHash, msg.stash),
 					msg.avatarEmail !== null ? this.avatarManager.getAvatarImage(msg.avatarEmail) : Promise.resolve(null)
-				]);
+				]) as [GitCommitDetailsData, string | null];
 				this.sendMessage({
 					command: 'commitDetails',
 					...data[0],
@@ -409,7 +409,7 @@ export class GitGraphView extends Disposable {
 					command: 'loadCommits',
 					refreshId: msg.refreshId,
 					onlyFollowFirstParent: msg.onlyFollowFirstParent,
-					...await this.dataSource.getCommits(msg.repo, msg.branches, msg.maxCommits, msg.showTags, msg.showRemoteBranches, msg.includeCommitsMentionedByReflogs, msg.onlyFollowFirstParent, msg.commitOrdering, msg.remotes, msg.hideRemotes, msg.stashes)
+					...await this.dataSource.getCommits(msg.repo, msg.branches, msg.maxCommits, msg.showTags, msg.showRemoteBranches, msg.includeCommitsMentionedByReflogs, msg.onlyFollowFirstParent, msg.commitOrdering, msg.remotes, msg.hideRemotes, msg.stashes, msg.author, msg.committer, msg.commitMessage, msg.commitHash, msg.dateFrom, msg.dateTo, msg.paths)
 				});
 				break;
 			case 'loadConfig':
@@ -717,10 +717,18 @@ export class GitGraphView extends Disposable {
 		} else if (numRepos > 0) {
 			body = `<body>
 			<div id="view" tabindex="-1">
-				<div id="controls">
+				<div id="controls" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px;">
 					<span id="repoControl"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
 					<span id="branchControl"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
-					<label id="showRemoteBranchesControl"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Show Remote Branches</label>
+					<label id="showRemoteBranchesControl" style="display:flex; align-items:center;"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Show Remote Branches</label>
+					<input type="text" id="authorInput" placeholder="Author" style="flex-grow: 1; min-width: 80px;">
+					<input type="text" id="commitIdInput" placeholder="Commit ID" style="flex-grow: 1; min-width: 80px;">
+					<input type="text" id="branchSearchInput" placeholder="Branch" style="flex-grow: 1; min-width: 80px;">
+					<input type="text" id="commitMessageInput" placeholder="Commit Message" style="flex-grow: 1; min-width: 120px;">
+					<input type="text" id="pathInput" placeholder="Path" style="flex-grow: 1; min-width: 100px;">
+					<input type="date" id="dateFromInput" title="Date From" style="flex-grow: 1; min-width: 120px;">
+					<input type="date" id="dateToInput" title="Date To" style="flex-grow: 1; min-width: 120px;">
+					<button id="searchBtn" title="Search">Search</button>
 					<div id="findBtn" title="Find"></div>
 					<div id="terminalBtn" title="Open a Terminal for this Repository"></div>
 					<div id="settingsBtn" title="Repository Settings"></div>

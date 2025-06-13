@@ -17,6 +17,8 @@ class FindWidget {
 	private position: number = -1;
 	private visible: boolean = false;
 
+	private keyupTimeout: number | null = null;
+
 	private readonly widgetElem: HTMLElement;
 	private readonly inputElem: HTMLInputElement;
 	private readonly caseSensitiveElem: HTMLElement;
@@ -38,8 +40,7 @@ class FindWidget {
 		document.body.appendChild(this.widgetElem);
 
 		this.inputElem = <HTMLInputElement>document.getElementById('findInput')!;
-		let keyupTimeout: NodeJS.Timer | null = null;
-		this.inputElem.addEventListener('keyup', (e) => {
+		this.inputElem.addEventListener('keyup', (e: KeyboardEvent) => {
 			if ((e.keyCode ? e.keyCode === 13 : e.key === 'Enter') && this.text !== '') {
 				if (e.shiftKey) {
 					this.prev();
@@ -48,16 +49,16 @@ class FindWidget {
 				}
 				handledEvent(e);
 			} else {
-				if (keyupTimeout !== null) clearTimeout(keyupTimeout);
-				keyupTimeout = setTimeout(() => {
-					keyupTimeout = null;
+				if (this.keyupTimeout !== null) clearTimeout(this.keyupTimeout);
+				this.keyupTimeout = setTimeout(() => {
+					this.keyupTimeout = null;
 					if (this.text !== this.inputElem.value) {
 						this.text = this.inputElem.value;
 						this.clearMatches();
 						this.findMatches(this.getCurrentHash(), true);
 						this.openCommitDetailsViewForCurrentMatchIfEnabled();
 					}
-				}, 200);
+				}, 200) as unknown as number;
 			}
 		});
 
@@ -224,7 +225,7 @@ class FindWidget {
 			} catch (e) {
 				findPattern = null;
 				findGlobalPattern = null;
-				this.widgetElem.setAttribute(ATTR_ERROR, e.message);
+				this.widgetElem.setAttribute(ATTR_ERROR, (e as Error).message);
 			}
 			if (findPattern !== null && findGlobalPattern !== null) {
 				let commitElems = getCommitElems(), j = 0, commit, zeroLengthMatch = false;
