@@ -717,23 +717,24 @@ export class GitGraphView extends Disposable {
 		} else if (numRepos > 0) {
 			body = `<body>
 			<div id="view" tabindex="-1">
-				<div id="controls" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px;">
+				<div id="controls">
 					<span id="repoControl"><span class="unselectable">Repo: </span><div id="repoDropdown" class="dropdown"></div></span>
 					<span id="branchControl"><span class="unselectable">Branches: </span><div id="branchDropdown" class="dropdown"></div></span>
-					<label id="showRemoteBranchesControl" style="display:flex; align-items:center;"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Show Remote Branches</label>
-					<input type="text" id="authorInput" placeholder="Author" style="flex-grow: 1; min-width: 80px;">
-					<input type="text" id="commitIdInput" placeholder="Commit ID" style="flex-grow: 1; min-width: 80px;">
-					<input type="text" id="branchSearchInput" placeholder="Branch" style="flex-grow: 1; min-width: 80px;">
-					<input type="text" id="commitMessageInput" placeholder="Commit Message" style="flex-grow: 1; min-width: 120px;">
-					<input type="text" id="pathInput" placeholder="Path" style="flex-grow: 1; min-width: 100px;">
-					<input type="date" id="dateFromInput" title="Date From" style="flex-grow: 1; min-width: 120px;">
-					<input type="date" id="dateToInput" title="Date To" style="flex-grow: 1; min-width: 120px;">
-					<button id="searchBtn" title="Search">Search</button>
+					<label id="showRemoteBranchesControl"><input type="checkbox" id="showRemoteBranchesCheckbox" tabindex="-1"><span class="customCheckbox"></span>Show Remote Branches</label>
 					<div id="findBtn" title="Find"></div>
 					<div id="terminalBtn" title="Open a Terminal for this Repository"></div>
 					<div id="settingsBtn" title="Repository Settings"></div>
 					<div id="fetchBtn"></div>
 					<div id="refreshBtn"></div>
+				</div>
+				<div id="controls-v2" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px;">
+					<input type="text" id="authorInput" placeholder="Author" style="flex-grow: 1; min-width: 80px;">
+					<input type="text" id="commitIdInput" placeholder="Commit ID" style="flex-grow: 1; min-width: 80px;">
+					<input type="text" id="commitMessageInput" placeholder="Commit Message" style="flex-grow: 1; min-width: 120px;">
+					<input type="text" id="pathInput" placeholder="Path" style="flex-grow: 1; min-width: 100px;">
+					<input type="date" id="dateFromInput" title="Date From" style="flex-grow: 1; min-width: 120px;">
+					<input type="date" id="dateToInput" title="Date To" style="flex-grow: 1; min-width: 120px;">
+					<button id="searchBtn" title="Search">Search</button>
 				</div>
 				<div id="content">
 					<div id="commitGraph"></div>
