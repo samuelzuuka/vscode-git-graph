@@ -11,6 +11,8 @@ import { RepoManager } from './repoManager';
 import { StatusBarItem } from './statusBarItem';
 import { GitExecutable, UNABLE_TO_FIND_GIT_MSG, findGit, getGitExecutableFromPaths, showErrorMessage, showInformationMessage } from './utils';
 import { EventEmitter } from './utils/event';
+import { BlameDecorator } from './blameDecorator';
+import { GitGraphView } from './gitGraphView';
 
 /**
  * Activate Git Graph.
@@ -45,6 +47,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const statusBarItem = new StatusBarItem(repoManager.getNumRepos(), repoManager.onDidChangeRepos, onDidChangeConfiguration, logger);
 	const commandManager = new CommandManager(context, avatarManager, dataSource, extensionState, repoManager, gitExecutable, onDidChangeGitExecutable, logger);
 	const diffDocProvider = new DiffDocProvider(dataSource);
+	const blameDecorator = new BlameDecorator();
 
 	context.subscriptions.push(
 		vscode.workspace.registerTextDocumentContentProvider(DiffDocProvider.scheme, diffDocProvider),
@@ -77,7 +80,19 @@ export async function activate(context: vscode.ExtensionContext) {
 		configurationEmitter,
 		extensionState,
 		gitExecutableEmitter,
-		logger
+		blameDecorator,
+		logger,
+		vscode.commands.registerCommand('git-graph.viewCommit', (repo: string, commitHash: string) => {
+			GitGraphView.createOrShow(
+				context.extensionPath,
+				dataSource,
+				extensionState,
+				avatarManager,
+				repoManager,
+				logger,
+				{ repo, commitDetails: { commitHash, compareWithHash: null } }
+			);
+		})
 	);
 	logger.log('Started Git Graph - Ready to use!');
 
