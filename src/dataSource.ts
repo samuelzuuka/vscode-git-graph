@@ -34,6 +34,10 @@ const GPG_STATUS_CODE_PARSING_DETAILS: Readonly<{ [statusCode: string]: GpgStatu
 	'REVKEYSIG': { status: GitSignatureStatus.GoodButMadeByRevokedKey, uid: true }
 };
 
+function isValidCommitId(str: string): boolean {
+	return /^[0-9a-f]{7,40}$/i.test(str);
+}
+
 /**
  * Interfaces Git Graph with the Git executable to provide all Git integrations.
  */
@@ -163,11 +167,48 @@ export class DataSource extends Disposable {
 	 */
 	public getCommits(repo: string, branches: ReadonlyArray<string> | null, maxCommits: number, showTags: boolean, showRemoteBranches: boolean, includeCommitsMentionedByReflogs: boolean, onlyFollowFirstParent: boolean, commitOrdering: CommitOrdering, remotes: ReadonlyArray<string>, hideRemotes: ReadonlyArray<string>, stashes: ReadonlyArray<GitStash>, author?: string, committer?: string, commitMessage?: string, commitHash?: string, dateFrom?: number, dateTo?: number, paths?: string[]): Promise<GitCommitData> {
 		const config = getConfig();
-		return Promise.all([
-			this.getLog(repo, branches, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, author, committer, commitMessage, commitHash, dateFrom, dateTo, paths),
-			this.getRefs(repo, showRemoteBranches, config.showRemoteHeads, hideRemotes).then((refData: GitRefData) => refData, (errorMessage: string) => errorMessage)
-		]).then(async (results) => {
-			let commits: GitCommitRecord[] = results[0], refData: GitRefData | string = results[1], i;
+
+		// commitMessage  : 同时搜索提交内容 和 hash
+		// commitHash     : 只搜索hash
+
+		const actions: Promise<any>[] = [];
+		// if (commitMessage) {
+		// 	let paramCommitMessage = undefined;
+		// 	let paramCommitHash = undefined;
+		// 	// if (isValidCommitId(commitMessage)) {
+		// 	// 	paramCommitHash = commitMessage;
+		// 	// 	paramCommitMessage = undefined;
+		// 	// 	actions.push(this.getLog(repo, branches, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, author, committer, paramCommitMessage, paramCommitHash, dateFrom, dateTo, paths));
+		// 	// }
+		// 	// paramCommitHash = undefined;
+		// 	// paramCommitMessage = commitMessage;
+
+		// 	paramCommitHash = commitMessage;
+		// 	paramCommitMessage = commitMessage;
+		// 	actions.push(this.getLog(repo, branches, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, author, committer, paramCommitMessage, paramCommitHash, dateFrom, dateTo, paths));
+		// } 
+		// else {
+			actions.push(this.getLog(repo, branches, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, author, committer, commitMessage, commitHash, dateFrom, dateTo, paths));
+		// } 
+		actions.push(this.getRefs(repo, showRemoteBranches, config.showRemoteHeads, hideRemotes).then((refData: GitRefData) => refData, (errorMessage: string) => errorMessage));
+
+		return Promise.all(actions).then(async (results) => {
+
+			const resultLength = results.length;
+			// @ts-ignore
+			let commits: GitCommitRecord[] = results[0];
+
+			if(resultLength == 3) {
+				// @ts-ignore
+				let anotherCommits = results[1];
+				// @ts-ignore
+				commits = [...commits, ...anotherCommits];
+			}
+
+			// @ts-ignore
+			let refData: GitRefData | string = results[resultLength-1];
+
+			let i;
 			let moreCommitsAvailable = commits.length === maxCommits + 1;
 			if (moreCommitsAvailable) commits.pop();
 

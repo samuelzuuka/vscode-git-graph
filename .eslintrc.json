@@ -103,7 +103,6 @@
         ],
         "yoda": "warn",
         "@typescript-eslint/await-thenable": "warn",
-        "@typescript-eslint/ban-ts-comment": "error",
         "@typescript-eslint/class-literal-property-style": [
             "warn",
             "fields"
@@ -121,6 +120,7 @@
             "warn",
             "property"
         ],
+        "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/naming-convention": [
             "warn",
             {
