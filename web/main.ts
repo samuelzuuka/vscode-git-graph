@@ -55,8 +55,7 @@ class GitGraphView {
 	private readonly scrollShadowElem: HTMLElement;
 
 	// @feat-update-search
-	private readonly authorInput: HTMLInputElement;
-	// private readonly commitIdInput: HTMLInputElement;
+	private readonly authorDropdown: Dropdown;
 	private readonly commitMessageInput: HTMLInputElement;
 	private readonly pathInput: HTMLInputElement;
 	private readonly dateFromInput: HTMLInputElement;
@@ -116,8 +115,10 @@ class GitGraphView {
 		});
 		this.renderRefreshButton();
 
-		this.authorInput = <HTMLInputElement>document.getElementById('authorInput')!;
-		// this.commitIdInput = <HTMLInputElement>document.getElementById('commitIdInput')!;
+		this.authorDropdown = new Dropdown('authorDropdown', false, false, 'Authors', (values) => {
+			this.triggerSearch();
+		});
+
 		this.commitMessageInput = <HTMLInputElement>document.getElementById('commitMessageInput')!;
 		this.pathInput = <HTMLInputElement>document.getElementById('pathInput')!;
 		this.dateFromInput = <HTMLInputElement>document.getElementById('dateFromInput')!;
@@ -125,8 +126,6 @@ class GitGraphView {
 		this.searchBtn = document.getElementById('searchBtn')!;
 
 		const inputElements = [
-			this.authorInput,
-			// this.commitIdInput,
 			this.commitMessageInput,
 			this.pathInput,
 			this.dateFromInput,
@@ -134,7 +133,6 @@ class GitGraphView {
 		];
 
 		inputElements.forEach(input => {
-			// input.addEventListener('input', () => this.debounceSearch());
 			input.addEventListener('change', () => this.triggerSearch()); // For date inputs
 		});
 
@@ -196,6 +194,13 @@ class GitGraphView {
 				name: this.gitRepos[this.currentRepo].name || getRepoName(this.currentRepo)
 			}, 'Opening Terminal');
 		});
+
+		this.loadAuthors();
+	}
+
+	private loadAuthors() {
+		if (!this.currentRepo) return;
+		window.postMessage({ command: 'getAuthors', repo: this.currentRepo }, '*');
 	}
 
 	private debounceSearch() {
@@ -209,8 +214,7 @@ class GitGraphView {
 
 	private triggerSearch() {
 		const newSearchTerms: { author?: string; committer?: string; commitMessage?: string; commitHash?: string; dateFrom?: number; dateTo?: number; paths?: string[]; } = {};
-		const author = this.authorInput.value.trim();
-		// const commitId = this.commitIdInput.value.trim();
+		const author = this.authorDropdown.getSelectedOptions(false)[0] || '';
 		const commitMessage = this.commitMessageInput.value.trim();
 		const path = this.pathInput.value.trim();
 		const dateFrom = this.dateFromInput.value;
@@ -219,7 +223,6 @@ class GitGraphView {
 		if (author) newSearchTerms.author = author;
 
 		if (commitMessage) newSearchTerms.commitMessage = commitMessage;
-		// if (commitId) newSearchTerms.commitHash = commitId;
 		if (dateFrom) newSearchTerms.dateFrom = new Date(dateFrom).getTime() / 1000;
 		if (dateTo) newSearchTerms.dateTo = new Date(dateTo).getTime() / 1000;
 		if (path) newSearchTerms.paths = path.split(/\s*,\s*|\s+/);
@@ -553,6 +556,24 @@ class GitGraphView {
 				: msg.error;
 			this.displayLoadDataError('Unable to load Commits', error);
 		}
+	}
+
+	public processGetAuthorsResponse(msg: GG.ResponseGetAuthors) {
+		let authors = [];
+		// 添加一个“All”选项
+		if(msg.authors && msg.authors.length > 0){
+			authors = [{ name: 'All', email: 'All', value: '' }];
+			msg.authors.forEach((a: { name: string, email: string }) => {
+				authors.push({ name: a.name, email: a.email, value: a.name });
+			});
+		}else{
+			authors = [{ name: 'All', email: 'All',value:'' }];
+		}
+		const options = authors.map((a: { name: string, email: string, value: string }) => ({
+			name: a.name + (a.email ? ` <${a.email}>` : ''),
+			value: a.value
+		}));
+		this.authorDropdown.setOptions(options, []);
 	}
 
 	public processLoadConfig(msg: GG.ResponseLoadConfig) {
@@ -3488,6 +3509,9 @@ window.addEventListener('load', () => {
 				break;
 			case 'viewScm':
 				finishOrDisplayError(msg.error, 'Unable to open the Source Control View');
+				break;
+			case 'getAuthors':
+				gitGraph.processGetAuthorsResponse(msg);
 				break;
 		}
 	});

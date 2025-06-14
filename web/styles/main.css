@@ -799,7 +799,7 @@ body.tagLabelsRightAligned .gitRef.tag{
 	white-space:nowrap;
 	margin:0 10px;
 }
-#repoDropdown, #branchDropdown{
+#repoDropdown, #branchDropdown, #authorDropdown{
 	margin-left:3px;
 }
 #showRemoteBranchesControl > .customCheckbox{
@@ -812,8 +812,14 @@ body.tagLabelsRightAligned .gitRef.tag{
 #controls.singleRepo #repoControl{
 	display:none;
 }
-#controls.singleRepo .dropdownCurrentValue{
+#controls.singleRepo .dropdownCurrentValue,
+#controls .dropdownCurrentValue{
 	max-width:40vw;
+}
+
+#authorDropdown .dropdownCurrentValue{
+	border: none;
+    background: none;
 }
 
 #findBtn, #terminalBtn, #settingsBtn, #fetchBtn, #refreshBtn{

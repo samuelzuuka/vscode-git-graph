@@ -262,7 +262,7 @@ class Dropdown {
 	 * @param names TRUE => Return the names of the selected options, FALSE => Return the values of the selected options.
 	 * @returns The array of the selected options.
 	 */
-	private getSelectedOptions(names: boolean) {
+	public getSelectedOptions(names: boolean) {
 		let selected = [];
 		if (this.multipleAllowed && this.optionsSelected[0]) {
 			// Note: Show All is always the first option (0 index) when multiple selected items are allowed

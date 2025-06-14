@@ -6,10 +6,11 @@ import * as vscode from 'vscode';
 import { AskpassEnvironment, AskpassManager } from './askpass/askpassManager';
 import { getConfig } from './config';
 import { Logger } from './logger';
-import { CommitOrdering, DateType, DeepWriteable, ErrorInfo, ErrorInfoExtensionPrefix, GitCommit, GitCommitDetails, GitCommitStash, GitConfigLocation, GitFileChange, GitFileStatus, GitPushBranchMode, GitRepoConfig, GitRepoConfigBranches, GitResetMode, GitSignature, GitSignatureStatus, GitStash, GitTagDetails, MergeActionOn, RebaseActionOn, SquashMessageFormat, TagType, Writeable } from './types';
+import { CommitOrdering, DateType, DeepWriteable, ErrorInfo, ErrorInfoExtensionPrefix, GitCommit, GitCommitDetails, GitCommitStash, GitConfigLocation, GitFileChange, GitFileStatus, GitPushBranchMode, GitRepoConfig, GitRepoConfigBranches, GitResetMode, GitSignature, GitSignatureStatus, GitStash, GitTagDetails, MergeActionOn, RebaseActionOn, SquashMessageFormat, TagType, Writeable, Author } from './types';
 import { GitExecutable, GitVersionRequirement, UNABLE_TO_FIND_GIT_MSG, UNCOMMITTED, abbrevCommit, constructIncompatibleGitVersionMessage, doesVersionMeetRequirement, getPathFromStr, getPathFromUri, openGitTerminal, pathWithTrailingSlash, realpath, resolveSpawnOutput, showErrorMessage } from './utils';
 import { Disposable } from './utils/disposable';
 import { Event } from './utils/event';
+import { GitGraphCacheManager } from './gitGraphCacheManager';
 
 const DRIVE_LETTER_PATH_REGEX = /^[a-z]:\//;
 const EOL_REGEX = /\r\n|\r|\n/g;
@@ -49,6 +50,7 @@ export class DataSource extends Disposable {
 	private gitFormatCommitDetails!: string;
 	private gitFormatLog!: string;
 	private gitFormatStash!: string;
+	private authorsCacheManager = GitGraphCacheManager.getAuthorsCacheManager();
 
 	/**
 	 * Creates the Git Graph Data Source.
@@ -1941,6 +1943,33 @@ export class DataSource extends Disposable {
 			});
 
 			this.logger.logCmd('git', args);
+		});
+	}
+
+	/**
+	 * 获取仓库所有作者（带文件缓存）。
+	 * @param repo 仓库路径
+	 * @returns 作者数组（Author[]）
+	 */
+	public async getAuthors(repo: string): Promise<Author[]> {
+		const cache = await this.authorsCacheManager.get(repo);
+		if (cache && Array.isArray(cache)) {
+			return cache;
+		}
+		return new Promise((resolve) => {
+			const cmd = `git log --format='%an${GIT_LOG_SEPARATOR}%ae' | sort | uniq`;
+			cp.exec(cmd, { cwd: repo, env: this.askpassEnv }, async (err, stdout) => {
+				if (err) return resolve([]);
+				let authors: Author[] = stdout.split(/\r?\n/)
+					.map(s => s.trim())
+					.filter(Boolean)
+					.map(line => {
+						const [name, email] = line.split(GIT_LOG_SEPARATOR);
+						return { name: name?.trim() || '', email: email?.trim() || '' };
+					});
+				await this.authorsCacheManager.set(repo, authors);
+				resolve(authors);
+			});
 		});
 	}
 }

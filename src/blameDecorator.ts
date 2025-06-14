@@ -26,7 +26,7 @@ export class BlameDecorator extends Disposable {
             },
             rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
         });
-		this.cacheManager = new GitGraphCacheManager('blame-cache');
+		this.cacheManager = GitGraphCacheManager.getBlameInfoCacheManager();
         this.registerListeners();
     }
 

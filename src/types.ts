@@ -1255,6 +1255,14 @@ export interface ResponseViewScm extends ResponseWithErrorInfo {
 	readonly command: 'viewScm';
 }
 
+export interface RequestGetAuthors extends RepoRequest {
+	readonly command: 'getAuthors';
+}
+export interface ResponseGetAuthors extends BaseMessage {
+	readonly command: 'getAuthors';
+	readonly authors: Author[];
+}
+
 export type RequestMessage =
 	RequestAddRemote
 	| RequestAddTag
@@ -1317,7 +1325,8 @@ export type RequestMessage =
 	| RequestViewDiff
 	| RequestViewDiffWithWorkingFile
 	| RequestViewFileAtRevision
-	| RequestViewScm;
+	| RequestViewScm
+	| RequestGetAuthors;
 
 export type ResponseMessage =
 	ResponseAddRemote
@@ -1378,7 +1387,8 @@ export type ResponseMessage =
 	| ResponseViewDiff
 	| ResponseViewDiffWithWorkingFile
 	| ResponseViewFileAtRevision
-	| ResponseViewScm;
+	| ResponseViewScm
+	| ResponseGetAuthors;
 
 
 /** Helper Types */
@@ -1407,3 +1417,8 @@ export type DeepWriteable<T> = T extends PrimitiveTypes
 	: T extends (Array<infer U> | ReadonlyArray<infer U>)
 	? Array<DeepWriteable<U>>
 	: { -readonly [K in keyof T]: DeepWriteable<T[K]> };
+
+export interface Author {
+	name: string;
+	email: string;
+}

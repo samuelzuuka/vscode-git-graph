@@ -39,6 +39,12 @@
 	border:4px solid transparent;
 	border-color:var(--vscode-editor-foreground) transparent transparent transparent;
 }
+#authorDropdown .dropdownCurrentValue:after{
+	top: 9px;
+}
+#authorDropdown.dropdownOpen .dropdownCurrentValue:after{
+	top: 3px;
+}
 .dropdown.dropdownOpen .dropdownCurrentValue:after{
 	border-color:transparent transparent var(--vscode-editor-foreground) transparent;
 	top:7px;

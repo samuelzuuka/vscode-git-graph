@@ -13,7 +13,7 @@ import { GitExecutable, UNABLE_TO_FIND_GIT_MSG, findGit, getGitExecutableFromPat
 import { EventEmitter } from './utils/event';
 import { BlameDecorator } from './blameDecorator';
 import { GitGraphView } from './gitGraphView';
-
+import { GitGraphCacheManager } from './gitGraphCacheManager';
 /**
  * Activate Git Graph.
  * @param context The context of the extension.
@@ -21,6 +21,9 @@ import { GitGraphView } from './gitGraphView';
 export async function activate(context: vscode.ExtensionContext) {
 	const logger = new Logger();
 	logger.log('Starting Git Graph ...');
+	// vscode.window.showInformationMessage('Starting Git Graph ...');
+
+	GitGraphCacheManager.clearAll();
 
 	const gitExecutableEmitter = new EventEmitter<GitExecutable>();
 	const onDidChangeGitExecutable = gitExecutableEmitter.subscribe;
@@ -94,6 +97,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			);
 		})
 	);
+
 	logger.log('Started Git Graph - Ready to use!');
 
 	extensionState.expireOldCodeReviews();

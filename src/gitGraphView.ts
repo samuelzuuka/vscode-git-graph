@@ -62,6 +62,7 @@ export class GitGraphView extends Disposable {
 			// If Git Graph panel doesn't already exist
 			GitGraphView.currentPanel = new GitGraphView(extensionPath, dataSource, extensionState, avatarManager, repoManager, logger, loadViewTo, column);
 		}
+		// GitGraphView.currentPanel.respondGetAuthors(GitGraphView.currentPanel.currentRepo);
 	}
 
 	/**
@@ -437,6 +438,8 @@ export class GitGraphView extends Disposable {
 					this.currentRepo = msg.repo;
 					this.extensionState.setLastActiveRepo(msg.repo);
 					this.repoFileWatcher.start(msg.repo);
+					// 获取authors信息
+					this.respondGetAuthors(msg.repo);
 				}
 				break;
 			case 'loadRepos':
@@ -624,6 +627,10 @@ export class GitGraphView extends Disposable {
 					error: await viewScm()
 				});
 				break;
+			case 'getAuthors':
+				const authors = await this.dataSource.getAuthors(msg.repo);
+				this.sendMessage({ command: 'getAuthors', authors });
+				break;
 		}
 
 		this.repoFileWatcher.unmute();
@@ -704,6 +711,9 @@ export class GitGraphView extends Disposable {
 		const workspaceState = this.extensionState.getWorkspaceViewState();
 
 		let body, numRepos = Object.keys(initialState.repos).length, colorVars = '', colorParams = '';
+		
+		// 全局边框色
+		colorVars += '--git-graph-border-color: rgba(128, 128, 128, 0.5); ';
 		for (let i = 0; i < initialState.config.graph.colours.length; i++) {
 			colorVars += '--git-graph-color' + i + ':' + initialState.config.graph.colours[i] + '; ';
 			colorParams += '[data-color="' + i + '"]{--git-graph-color:var(--git-graph-color' + i + ');} ';
@@ -732,9 +742,8 @@ export class GitGraphView extends Disposable {
 					<div id="refreshBtn"></div>
 				</div>
 				<div id="controls-v2" class="ggrh:flex ggrh:flex-wrap ggrh:items-center ggrh:gap-0.5 ggrh:p-0.5 ggrh:rounded ggrh:shadow-md ggrh:text-xs">
-					<!-- <input type="text" id="commitIdInput" placeholder="Commit ID" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs"> -->
 					<input type="text" id="commitMessageInput" placeholder="Commit Message" class="ggrh:flex-1 ggrh:min-w-[60px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
-					<input type="text" id="authorInput" placeholder="Author" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
+					<div id="authorDropdown" class="dropdown ggrh:flex-1 ggrh:min-w-[40px] ggrh:text-xs"></div>
 					<input type="date" id="dateFromInput" title="Date From" class="ggrh:flex-1 ggrh:min-w-[60px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
 					<input type="date" id="dateToInput" title="Date To" class="ggrh:flex-1 ggrh:min-w-[60px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
 					<input type="text" id="pathInput" placeholder="Path" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
@@ -771,8 +780,16 @@ export class GitGraphView extends Disposable {
 				<link rel="stylesheet" type="text/css" href="${this.getMediaUri('out.min.css')}">
 				<title>Git Graph</title>
 				<style>body{${colorVars}} ${colorParams}
+				#controls{
+					border-bottom: none;
+				}
+				#controls-v2{
+					padding: 4px;
+					border-bottom: var(--git-graph-border-color);
+					border-radius: 0;
+				}
 				#controls-v2 input{
-					border-color: var(--vscode-input-border) !important;
+					border-color: var(--git-graph-border-color) !important;
 					background: var(--vscode-input-background) !important;
 					color: var(--vscode-input-foreground) !important;
 				}
@@ -783,6 +800,18 @@ export class GitGraphView extends Disposable {
 				}
 				#controls-v2 button:hover {
 					background: var(--vscode-button-hoverBackground) !important;
+				}
+				#controls-v2 .dropdown {
+					border: 1px solid var(--git-graph-border-color);
+					border-radius: 4px;
+					min-height: 22px;
+					background: var(--vscode-input-background);
+					display: flex;
+					align-items: center;
+					margin-left: 0;
+					padding: 0;
+					margin-top: 0;
+					height: 22px;
 				}
 				</style>
 			</head>
@@ -834,6 +863,21 @@ export class GitGraphView extends Disposable {
 			repos: repos,
 			lastActiveRepo: this.extensionState.getLastActiveRepo(),
 			loadViewTo: loadViewTo
+		});
+	}
+
+	/**
+	 * Send the authors to the front-end.
+	 * @param authors The set of authors.
+	 */
+	private async respondGetAuthors(repo: string | null) {
+		if (repo === null) {
+			return;
+		}
+		const authors = await this.dataSource.getAuthors(repo);
+		this.sendMessage({
+			command: 'getAuthors',
+			authors: authors
 		});
 	}
 }
