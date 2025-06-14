@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Disposable } from './utils/disposable';
-import { BlameCacheManager } from './blameCacheManager';
+import { GitGraphCacheManager } from './gitGraphCacheManager';
 
 export interface BlameLineInfo {
     hash: string;
@@ -14,7 +14,7 @@ export interface BlameLineInfo {
  */
 export class BlameDecorator extends Disposable {
     private decorationType: vscode.TextEditorDecorationType;
-    private cacheManager: BlameCacheManager;
+    private cacheManager: GitGraphCacheManager;
     private processingFiles: Set<string> = new Set();
 
     constructor() {
@@ -26,7 +26,7 @@ export class BlameDecorator extends Disposable {
             },
             rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
         });
-		this.cacheManager = new BlameCacheManager();
+		this.cacheManager = new GitGraphCacheManager('blame-cache');
         this.registerListeners();
     }
 

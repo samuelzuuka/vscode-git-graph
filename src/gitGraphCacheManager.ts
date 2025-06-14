@@ -2,19 +2,20 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import * as os from 'os';
-import { BlameLineInfo } from './blameDecorator';
 import { promisify } from 'util';
 
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
 const unlinkAsync = promisify(fs.unlink);
 
-export class BlameCacheManager {
+export class GitGraphCacheManager {
     private cacheDir: string;
+    private subdirName: string;
 
-    constructor() {
-        // 在用户主目录下创建 .git-graph/blame-cache 目录
-        this.cacheDir = path.join(os.homedir(), '.git-graph', 'blame-cache');
+    constructor(subdirName: string) {
+        this.subdirName = subdirName;
+        // 在用户主目录下创建 .git-graph/<subdirName> 目录
+        this.cacheDir = path.join(os.homedir(), '.git-graph', subdirName);
         if (!fs.existsSync(this.cacheDir)) {
             fs.mkdirSync(this.cacheDir, { recursive: true } as any);
         }
@@ -28,7 +29,7 @@ export class BlameCacheManager {
         return path.join(this.cacheDir, this.getCacheKey(filePath) + '.json');
     }
 
-    public async get(filePath: string): Promise<BlameLineInfo[] | null> {
+    public async get(filePath: string): Promise<any | null> {
         const cachePath = this.getCachePath(filePath);
         
         try {
@@ -45,19 +46,19 @@ export class BlameCacheManager {
                 return JSON.parse(cacheContent);
             }
         } catch (error) {
-            console.error('Error reading blame cache:', error);
+            console.error(`Error reading ${this.subdirName} cache:`, error);
         }
         
         return null;
     }
 
-    public async set(filePath: string, blameInfo: BlameLineInfo[]): Promise<void> {
+    public async set(filePath: string, cacheValue: any): Promise<void> {
         const cachePath = this.getCachePath(filePath);
         
         try {
-            await writeFileAsync(cachePath, JSON.stringify(blameInfo), 'utf8');
+            await writeFileAsync(cachePath, JSON.stringify(cacheValue), 'utf8');
         } catch (error) {
-            console.error('Error writing blame cache:', error);
+            console.error(`Error writing ${this.subdirName} cache:`, error);
         }
     }
 
@@ -69,7 +70,7 @@ export class BlameCacheManager {
                 await unlinkAsync(cachePath);
             }
         } catch (error) {
-            console.error('Error clearing blame cache:', error);
+            console.error(`Error clearing ${this.subdirName} cache:`, error);
         }
     }
 } 
