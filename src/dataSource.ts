@@ -172,24 +172,19 @@ export class DataSource extends Disposable {
 		// commitHash     : 只搜索hash
 
 		const actions: Promise<any>[] = [];
-		// if (commitMessage) {
-		// 	let paramCommitMessage = undefined;
-		// 	let paramCommitHash = undefined;
-		// 	// if (isValidCommitId(commitMessage)) {
-		// 	// 	paramCommitHash = commitMessage;
-		// 	// 	paramCommitMessage = undefined;
-		// 	// 	actions.push(this.getLog(repo, branches, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, author, committer, paramCommitMessage, paramCommitHash, dateFrom, dateTo, paths));
-		// 	// }
-		// 	// paramCommitHash = undefined;
-		// 	// paramCommitMessage = commitMessage;
+		if (commitMessage) {
+			let paramCommitMessage = undefined;
+			let paramCommitHash = undefined;
 
-		// 	paramCommitHash = commitMessage;
-		// 	paramCommitMessage = commitMessage;
-		// 	actions.push(this.getLog(repo, branches, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, author, committer, paramCommitMessage, paramCommitHash, dateFrom, dateTo, paths));
-		// } 
-		// else {
+			actions.push(this.getLogByCommitid(repo, commitOrdering, commitMessage));
+
+			paramCommitHash = undefined;
+			paramCommitMessage = commitMessage;
+			actions.push(this.getLog(repo, branches, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, author, committer, paramCommitMessage, paramCommitHash, dateFrom, dateTo, paths));
+		} 
+		else {
 			actions.push(this.getLog(repo, branches, maxCommits + 1, showTags && config.showCommitsOnlyReferencedByTags, showRemoteBranches, includeCommitsMentionedByReflogs, onlyFollowFirstParent, commitOrdering, remotes, hideRemotes, stashes, author, committer, commitMessage, commitHash, dateFrom, dateTo, paths));
-		// } 
+		} 
 		actions.push(this.getRefs(repo, showRemoteBranches, config.showRemoteHeads, hideRemotes).then((refData: GitRefData) => refData, (errorMessage: string) => errorMessage));
 
 		return Promise.all(actions).then(async (results) => {
@@ -1602,6 +1597,54 @@ export class DataSource extends Disposable {
 			}
 			return commits;
 		});
+	}
+
+	/**
+	 * Get the raw commits in a repository.
+	 * @param repo The path of the repository.
+	 * @param commitHash The commit hash to show.
+	 * @returns An array of commits.
+	 */
+	private getLogByCommitid(repo: string, order: CommitOrdering, commitHash: string) {
+
+		// git log 850e7015 -1 --pretty=format:"%H|%P|%an|%ae|%at|%s"
+		// show 850e7015
+		/**
+		commit 850e701591b572a839c3d56ef3c4b656d2167aa3
+		Author: samuel <zukai@yonyou.com>
+		Date:   Fri Jun 13 10:07:09 2025 +0800
+
+			新增 .cursorignore 文件以忽略测试目录的索引
+
+		diff --git a/.cursorignore b/.cursorignore
+		new file mode 100644
+		index 0000000..fada27f
+		--- /dev/null
+		+++ b/.cursorignore
+		@@ -0,0 +1,2 @@
+		+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *
+		.csv)
+		+tests
+		\ No newline at end of file
+		 */
+		const args = ['-c', 'log.showSignature=false', 'log', commitHash, '--max-count=1', '--format=' + this.gitFormatLog, '--' + order + '-order'];
+		try {
+			return this.spawnGit(args, repo, (stdout) => {
+					let lines = stdout.split(EOL_REGEX);
+					let commits: GitCommitRecord[] = [];
+				for (let i = 0; i < lines.length - 1; i++) {
+					let line = lines[i].split(GIT_LOG_SEPARATOR);
+					if (line.length !== 6) break;
+					commits.push({ hash: line[0], parents: line[1] !== '' ? line[1].split(' ') : [], author: line[2], email: line[3], date: parseInt(line[4]), message: line[5] });
+				}
+				return commits;
+			});
+		} catch (error) {
+			console.error("getLogByCommitid error", error);
+			return new Promise((resolve, reject) => {
+				resolve([]);
+			});
+		}
 	}
 
 	/**

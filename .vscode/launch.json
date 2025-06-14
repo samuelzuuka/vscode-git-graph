@@ -8,7 +8,8 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"/Users/samuel/Projects/JavaProjects/piaoeda-cloud-special"
+				// "/Users/samuel/Projects/JavaProjects/piaoeda-cloud-special",
+				"/Users/samuel/Projects/PhpProjects/buildadmin",
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"

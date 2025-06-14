@@ -56,7 +56,7 @@ class GitGraphView {
 
 	// @feat-update-search
 	private readonly authorInput: HTMLInputElement;
-	private readonly commitIdInput: HTMLInputElement;
+	// private readonly commitIdInput: HTMLInputElement;
 	private readonly commitMessageInput: HTMLInputElement;
 	private readonly pathInput: HTMLInputElement;
 	private readonly dateFromInput: HTMLInputElement;
@@ -117,7 +117,7 @@ class GitGraphView {
 		this.renderRefreshButton();
 
 		this.authorInput = <HTMLInputElement>document.getElementById('authorInput')!;
-		this.commitIdInput = <HTMLInputElement>document.getElementById('commitIdInput')!;
+		// this.commitIdInput = <HTMLInputElement>document.getElementById('commitIdInput')!;
 		this.commitMessageInput = <HTMLInputElement>document.getElementById('commitMessageInput')!;
 		this.pathInput = <HTMLInputElement>document.getElementById('pathInput')!;
 		this.dateFromInput = <HTMLInputElement>document.getElementById('dateFromInput')!;
@@ -126,7 +126,7 @@ class GitGraphView {
 
 		const inputElements = [
 			this.authorInput,
-			this.commitIdInput,
+			// this.commitIdInput,
 			this.commitMessageInput,
 			this.pathInput,
 			this.dateFromInput,
@@ -210,7 +210,7 @@ class GitGraphView {
 	private triggerSearch() {
 		const newSearchTerms: { author?: string; committer?: string; commitMessage?: string; commitHash?: string; dateFrom?: number; dateTo?: number; paths?: string[]; } = {};
 		const author = this.authorInput.value.trim();
-		const commitId = this.commitIdInput.value.trim();
+		// const commitId = this.commitIdInput.value.trim();
 		const commitMessage = this.commitMessageInput.value.trim();
 		const path = this.pathInput.value.trim();
 		const dateFrom = this.dateFromInput.value;
@@ -219,7 +219,7 @@ class GitGraphView {
 		if (author) newSearchTerms.author = author;
 
 		if (commitMessage) newSearchTerms.commitMessage = commitMessage;
-		if (commitId) newSearchTerms.commitHash = commitId;
+		// if (commitId) newSearchTerms.commitHash = commitId;
 		if (dateFrom) newSearchTerms.dateFrom = new Date(dateFrom).getTime() / 1000;
 		if (dateTo) newSearchTerms.dateTo = new Date(dateTo).getTime() / 1000;
 		if (path) newSearchTerms.paths = path.split(/\s*,\s*|\s+/);

@@ -732,7 +732,7 @@ export class GitGraphView extends Disposable {
 					<div id="refreshBtn"></div>
 				</div>
 				<div id="controls-v2" class="ggrh:flex ggrh:flex-wrap ggrh:items-center ggrh:gap-0.5 ggrh:p-0.5 ggrh:rounded ggrh:shadow-md ggrh:text-xs">
-					<input type="text" id="commitIdInput" placeholder="Commit ID" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
+					<!-- <input type="text" id="commitIdInput" placeholder="Commit ID" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs"> -->
 					<input type="text" id="commitMessageInput" placeholder="Commit Message" class="ggrh:flex-1 ggrh:min-w-[60px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
 					<input type="text" id="authorInput" placeholder="Author" class="ggrh:flex-1 ggrh:min-w-[40px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
 					<input type="date" id="dateFromInput" title="Date From" class="ggrh:flex-1 ggrh:min-w-[60px] ggrh:px-1 ggrh:py-0.5 ggrh:border ggrh:rounded ggrh:text-xs">
@@ -770,7 +770,21 @@ export class GitGraphView extends Disposable {
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link rel="stylesheet" type="text/css" href="${this.getMediaUri('out.min.css')}">
 				<title>Git Graph</title>
-				<style>body{${colorVars}} ${colorParams}</style>
+				<style>body{${colorVars}} ${colorParams}
+				#controls-v2 input{
+					border-color: var(--vscode-input-border) !important;
+					background: var(--vscode-input-background) !important;
+					color: var(--vscode-input-foreground) !important;
+				}
+				#controls-v2 button {
+					border-color: var(--vscode-button-border) !important;
+					background: var(--vscode-button-background) !important;
+					color: var(--vscode-button-foreground) !important;
+				}
+				#controls-v2 button:hover {
+					background: var(--vscode-button-hoverBackground) !important;
+				}
+				</style>
 			</head>
 			${body}
 		</html>`;
