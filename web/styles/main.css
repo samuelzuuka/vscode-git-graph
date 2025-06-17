@@ -298,6 +298,8 @@ code{
 
 #cdv.inline{
 	vertical-align:top;
+	/* 选中的commit背景色 */
+	background: #57a85726;
 }
 #cdv.inline td{
 	background-color:rgba(128,128,128,0.1);
@@ -312,7 +314,9 @@ code{
 	left:0;
 	right:0;
 	bottom:0;
-	background-color:rgba(128,128,128,0.1);
+	/* background-color:rgba(128,128,128,0.1); */
+	/* 选中的commit背景色 */
+	background: #57a85726;
 	font-size:13px;
 	line-height:18px;
 	white-space:normal;
@@ -653,14 +657,23 @@ svg.openFolderIcon, svg.closedFolderIcon, svg.fileIcon{
 	cursor:help;
 	box-sizing: content-box;
 }
-#commitTable tr.commit:hover, #commitTable tr.commit.contextMenuActive, #commitTable tr.commit.findCurrentCommit:hover, #commitTable tr.commit.graphVertexActive, #commitTable tr.commit.dialogActive{
+#commitTable tr.commit:hover, 
+#commitTable tr.commit.contextMenuActive, 
+#commitTable tr.commit.findCurrentCommit:hover, 
+#commitTable tr.commit.graphVertexActive, 
+#commitTable tr.commit.dialogActive{
 	background-color:rgba(128,128,128,0.15);
 }
 #commitTable tr.commit.commitDetailsOpen{
-	background-color:rgba(128,128,128,0.25);
+	/* background-color:rgba(128,128,128,0.25); */
+	background-color: rgb(16, 172, 48, 0.4);
 }
-#commitTable tr.commit.commitDetailsOpen:hover, #commitTable tr.commit.commitDetailsOpen.contextMenuActive, #commitTable tr.commit.commitDetailsOpen.dialogActive, #commitTable tr.commit.commitDetailsOpen.graphVertexActive{
-	background-color:rgba(128,128,128,0.35);
+#commitTable tr.commit.commitDetailsOpen:hover, 
+#commitTable tr.commit.commitDetailsOpen.contextMenuActive, 
+#commitTable tr.commit.commitDetailsOpen.dialogActive, 
+#commitTable tr.commit.commitDetailsOpen.graphVertexActive{
+	/* background-color:rgba(128,128,128,0.35); */
+	background-color: rgb(16, 172, 48, 0.5);
 }
 
 #commitTable tr.commit.findCurrentCommit {
